@@ -22,7 +22,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use("/resized", express.static(path.join(__dirname, "resized")));
 
 // Route to upload and resize media
 app.post("/api/upload", async (req, res) => {
