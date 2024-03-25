@@ -4,16 +4,17 @@ const fs = require("fs");
 const path = require("path");
 const ffmpegStatic = require("ffmpeg-static");
 
+
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
-const localOutputPath = path.join(__dirname, "..", "public", "resized");
 
-if (!fs.existsSync(localOutputPath)) {
-  fs.mkdirSync(localOutputPath, { recursive: true });
+const outputPath = "https://resize-be.onrender.com/resized/";
+if (!fs.existsSync(outputPath)) {
+  fs.mkdirSync(outputPath, { recursive: true });
 }
 
-const saveBufferToFile = async (buffer, fileName) => {
-  const filePath = path.join(localOutputPath, fileName);
+const saveBufferToFile = async (buffer, outputPath, fileName) => {
+  const filePath = path.join(outputPath, fileName);
   await fs.promises.writeFile(filePath, buffer);
   return filePath;
 };
@@ -21,7 +22,7 @@ const saveBufferToFile = async (buffer, fileName) => {
 const resizeImage = async (file, width, height) => {
   const image = await Jimp.read(file.data);
   await image.resize(parseInt(width, 10), parseInt(height, 10)); // Set quality for JPEG images
-  const outputFilePath = path.join(localOutputPath, file.name);
+  const outputFilePath = path.join(outputPath, file.name);
   await image.writeAsync(outputFilePath);
   return outputFilePath;
 };
@@ -30,10 +31,10 @@ const resizeVideo = async (file, width, height) => {
   return new Promise(async (resolve, reject) => {
     const inputFilePath = await saveBufferToFile(
       file.data,
-      localOutputPath,
+      outputPath,
       `temp-${file.name}`
     );
-    const outputFilePath = path.join(localOutputPath, file.name);
+    const outputFilePath = path.join(outputPath, file.name);
 
     ffmpeg(inputFilePath)
       .videoFilters(
@@ -70,8 +71,8 @@ const resizeMedia = async (req, res) => {
   } else {
     return res.status(400).send("Unsupported media type.");
   }
-  const publicUrl = `https://resize-be.onrender.com/resized/${file.name}`;
-  res.send({ url: publicUrl });
+
+  res.send({ url: outputFilePath });
 };
 
 module.exports = { resizeMedia };
