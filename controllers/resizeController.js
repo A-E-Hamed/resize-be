@@ -5,17 +5,15 @@ const path = require("path");
 const ffmpegStatic = require("ffmpeg-static");
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
-ffmpeg.setFfprobePath(ffmpegStatic.replace('ffmpeg', 'ffprobe'));
 
+const localOutputPath = path.join(__dirname, "..", "public", "resized");
 
-
-const outputPath = "https://resize-be.onrender.com/resized/";
-if (!fs.existsSync(outputPath)) {
-  fs.mkdirSync(outputPath, { recursive: true });
+if (!fs.existsSync(localOutputPath)) {
+  fs.mkdirSync(localOutputPath, { recursive: true });
 }
 
-const saveBufferToFile = async (buffer, outputPath, fileName) => {
-  const filePath = path.join(outputPath, fileName);
+const saveBufferToFile = async (buffer, fileName) => {
+  const filePath = path.join(localOutputPath, fileName);
   await fs.promises.writeFile(filePath, buffer);
   return filePath;
 };
@@ -72,8 +70,8 @@ const resizeMedia = async (req, res) => {
   } else {
     return res.status(400).send("Unsupported media type.");
   }
-
-  res.send({ url: outputFilePath });
+  const publicUrl = `https://resize-be.onrender.com/resized/${file.name}`;
+  res.send({ url: publicUrl });
 };
 
 module.exports = { resizeMedia };
