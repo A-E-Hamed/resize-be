@@ -2,10 +2,11 @@ const Jimp = require("jimp");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 const path = require("path");
-import * as ffmpegStatic from 'ffmpeg-static';
-
+const ffmpegStatic = require("ffmpeg-static");
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
+ffmpeg.setFfprobePath(ffmpegStatic.replace('ffmpeg', 'ffprobe'));
+
 
 
 const outputPath = "https://resize-be.onrender.com/resized/";
