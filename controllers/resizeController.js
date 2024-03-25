@@ -21,7 +21,7 @@ const saveBufferToFile = async (buffer, fileName) => {
 const resizeImage = async (file, width, height) => {
   const image = await Jimp.read(file.data);
   await image.resize(parseInt(width, 10), parseInt(height, 10)); // Set quality for JPEG images
-  const outputFilePath = path.join(outputPath, file.name);
+  const outputFilePath = path.join(localOutputPath, file.name);
   await image.writeAsync(outputFilePath);
   return outputFilePath;
 };
@@ -30,10 +30,10 @@ const resizeVideo = async (file, width, height) => {
   return new Promise(async (resolve, reject) => {
     const inputFilePath = await saveBufferToFile(
       file.data,
-      outputPath,
+      localOutputPath,
       `temp-${file.name}`
     );
-    const outputFilePath = path.join(outputPath, file.name);
+    const outputFilePath = path.join(localOutputPath, file.name);
 
     ffmpeg(inputFilePath)
       .videoFilters(
