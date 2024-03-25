@@ -10,7 +10,7 @@ ffmpeg.setFfprobePath(
   "C:/Users/user/Downloads/ffmpeg-master-latest-win64-gpl-shared/ffmpeg-master-latest-win64-gpl-shared/bin/ffprobe.exe"
 );
 
-const outputPath = "public/resized/";
+const outputPath = "https://resize-be.onrender.com/resized/";
 if (!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath, { recursive: true });
 }
@@ -31,13 +31,19 @@ const resizeImage = async (file, width, height) => {
 
 const resizeVideo = async (file, width, height) => {
   return new Promise(async (resolve, reject) => {
-    const inputFilePath = await saveBufferToFile(file.data, outputPath, `temp-${file.name}`);
+    const inputFilePath = await saveBufferToFile(
+      file.data,
+      outputPath,
+      `temp-${file.name}`
+    );
     const outputFilePath = path.join(outputPath, file.name);
 
     ffmpeg(inputFilePath)
-      .videoFilters(`scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2`)
-      .videoCodec('libx264') // Use the H.264 codec
-      .addOptions(['-crf 18']) // Set the Constant Rate Factor to 18, which is roughly "visually lossless"
+      .videoFilters(
+        `scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2`
+      )
+      .videoCodec("libx264") // Use the H.264 codec
+      .addOptions(["-crf 18"]) // Set the Constant Rate Factor to 18, which is roughly "visually lossless"
       .on("error", (err) => {
         console.error("Error processing video:", err);
         fs.unlinkSync(inputFilePath); // Clean up
@@ -50,7 +56,6 @@ const resizeVideo = async (file, width, height) => {
       .save(outputFilePath);
   });
 };
-
 
 const resizeMedia = async (req, res) => {
   if (!req.files || !req.files.media) {
